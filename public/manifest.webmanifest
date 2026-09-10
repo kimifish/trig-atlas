@@ -1,0 +1,17 @@
+{
+  "name": "Тригонометрический атлас",
+  "short_name": "Тригонометрия",
+  "description": "Интерактивная единичная окружность и графики тригонометрических функций",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "lang": "ru",
+  "theme_color": "#101820",
+  "background_color": "#0b1118",
+  "icons": [
+    { "src": "pwa-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "pwa-512x512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "pwa-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

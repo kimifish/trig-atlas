@@ -194,6 +194,7 @@ h1 {
 .circle-stage {
   position: relative;
   width: min(100%, 510px);
+  flex: 0 0 auto;
   margin: 0 auto;
 }
 
@@ -495,8 +496,11 @@ h1 {
 
 .learning-note {
   width: min(100%, 540px);
+  height: 80px;
+  flex: 0 0 auto;
   margin: 0 auto;
   padding: 11px 14px;
+  overflow-y: auto;
   border-left: 2px solid rgba(233, 226, 208, 0.58);
   background: linear-gradient(90deg, rgba(233, 226, 208, 0.055), transparent);
   animation: reveal 220ms ease both;
@@ -519,6 +523,7 @@ h1 {
 }
 
 .values {
+  flex: 0 0 auto;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 7px;
@@ -526,6 +531,7 @@ h1 {
 
 .value-card {
   position: relative;
+  height: 66px;
   min-width: 0;
   min-height: 66px;
   padding: 9px 9px 8px;
@@ -610,7 +616,8 @@ footer {
   }
 
   .value-card {
-    min-height: 52px;
+    height: 54px;
+    min-height: 54px;
     padding: 7px 5px 6px;
   }
 
@@ -628,6 +635,12 @@ footer {
   .value-card small {
     margin-left: 0;
     font-size: 7px;
+  }
+}
+
+@media (max-width: 600px) {
+  .learning-note {
+    height: 112px;
   }
 }
 

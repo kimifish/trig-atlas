@@ -88,8 +88,9 @@ function MiniGraph({ angle, kind, unit, onKindChange }: MiniGraphProps) {
   const sinY = middle - Math.sin((normalized * Math.PI) / 180) * amplitude;
   const cosY = middle - Math.cos((normalized * Math.PI) / 180) * amplitude;
   const graphAngles = (angles: number[]) => angles.flatMap((match) => match === 0 ? [0, 360] : [match]);
-  const matchingCosAngles = graphAngles(cofunctionMatchAngles("sin", normalized));
-  const matchingSinAngles = graphAngles(cofunctionMatchAngles("cos", normalized));
+  const isCurrentAngle = (match: number) => Math.abs(match - normalized) < 0.0001;
+  const matchingCosAngles = graphAngles(cofunctionMatchAngles("sin", normalized)).filter((match) => !isCurrentAngle(match));
+  const matchingSinAngles = graphAngles(cofunctionMatchAngles("cos", normalized)).filter((match) => !isCurrentAngle(match));
   const tan = trigValue("tan", normalized);
   const tanY = tan === null ? null : middle - tan * 17;
 
@@ -106,8 +107,8 @@ function MiniGraph({ angle, kind, unit, onKindChange }: MiniGraphProps) {
         <line x1={left} y1={middle} x2={right} y2={middle} className="graph-axis" />
         {[0, 90, 180, 270, 360].map((tick) => (
           <g key={tick}>
-            <line x1={xFor(tick)} y1="18" x2={xFor(tick)} y2="112" className="graph-grid" />
-            <text x={xFor(tick)} y="12" textAnchor={tick === 0 ? "start" : tick === 360 ? "end" : "middle"} className="graph-label">
+            <line x1={xFor(tick)} y1="27" x2={xFor(tick)} y2="112" className="graph-grid" />
+            <text x={xFor(tick)} y="21" textAnchor={tick === 0 ? "start" : tick === 360 ? "end" : "middle"} className="graph-label">
               {unit === "degrees"
                 ? `${tick}°`
                 : tick === 0 ? "0" : tick === 180 ? "π" : tick === 360 ? "2π" : tick === 90 ? "π/2" : "3π/2"}
@@ -257,12 +258,14 @@ function UnitCircle({ angle, unit, mode, onAngleChange }: CircleProps) {
 
         <circle cx={cx} cy={cy} r={radius * 0.75} className="inner-ring" />
         <circle cx={cx} cy={cy} r={radius} className="circle-outline" />
-        <g className="sign-guides" aria-hidden="true">
-          <text x="116" y="54" className="sign-sin">sin +</text>
-          <text x="116" y="315" className="sign-sin negative-sign">sin −</text>
-          <text x="47" y="171" className="sign-cos">cos −</text>
-          <text x="283" y="171" className="sign-cos">cos +</text>
-        </g>
+        {mode !== "learn" && (
+          <g className="sign-guides" aria-hidden="true">
+            <text x="116" y="54" className="sign-sin">sin +</text>
+            <text x="116" y="315" className="sign-sin negative-sign">sin −</text>
+            <text x="47" y="171" className="sign-cos">cos −</text>
+            <text x="283" y="171" className="sign-cos">cos +</text>
+          </g>
+        )}
 
         {STANDARD_ANGLES.slice(0, -1).map((standard) => {
           const outer = polarPoint(cx, cy, radius + 4, standard.degrees);
@@ -280,15 +283,6 @@ function UnitCircle({ angle, unit, mode, onAngleChange }: CircleProps) {
             </g>
           );
         })}
-
-        {mode === "learn" && (
-          <g className="quarter-notes">
-            <text x="235" y="116">I · sin + · cos +</text>
-            <text x="80" y="116">II · sin + · cos −</text>
-            <text x="78" y="252">III · sin − · cos −</text>
-            <text x="232" y="252">IV · sin − · cos +</text>
-          </g>
-        )}
 
         <polygon points={`${cx},${cy} ${point.x},${cy} ${point.x},${point.y}`} className="triangle-fill" />
         <line x1={cx} y1={cy} x2={point.x} y2={point.y} className="radius-line" />
@@ -373,7 +367,7 @@ export default function App() {
       <header className="topbar">
         <div className="brand">
           <span className="brand-mark">α</span>
-          <div><small>Интерактивный</small><h1>Тригонометрический атлас</h1></div>
+          <div><small>Интерактивный</small><h1>Атлас углов</h1></div>
         </div>
         <div className="unit-switch" aria-label="Единицы угла">
           <button aria-pressed={unit === "degrees"} className={unit === "degrees" ? "active" : ""} onClick={() => setUnit("degrees")}>°</button>

@@ -69,16 +69,14 @@ describe("trigonometric values", () => {
 });
 
 describe("learning observations", () => {
-  it("explains the geometry of common angles with exact values", () => {
-    expect(learningObservation(30)).toContain("M(cos α; sin α) = (√3/2; 1/2)");
-    expect(learningObservation(30)).toContain("катет напротив 30° равен половине гипотенузы");
-    expect(learningObservation(45)).toContain("sin α = cos α");
-    expect(learningObservation(90)).toContain("tg α = не определён");
+  it("connects common angles to real-world examples", () => {
+    expect(learningObservation(30)).toContain("скатов крыш");
+    expect(learningObservation(45)).toContain("Диагональ квадрата");
+    expect(learningObservation(120)).toContain("трёхфазного тока");
   });
 
-  it("connects reflected angles to their reference angle and quadrant signs", () => {
-    expect(learningObservation(150)).toContain("Опорный угол — 30°");
-    expect(learningObservation(150)).toContain("во II четверти sin положителен");
-    expect(learningObservation(225)).toContain("в III четверти sin и cos отрицательны");
+  it("uses general information when there is no useful angle-specific fact", () => {
+    expect(learningObservation(150)).toContain("таблицу стандартных углов");
+    expect(learningObservation(137)).toContain("навигации, геодезии");
   });
 });

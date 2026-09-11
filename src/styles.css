@@ -238,6 +238,10 @@ h1 {
   font-size: 10px;
 }
 
+.tick-label {
+  font-size: 12px;
+}
+
 .circle-outline {
   fill: none;
   stroke: rgba(233, 226, 208, 0.72);
@@ -465,6 +469,23 @@ h1 {
 .wave-sin { stroke: var(--sin); }
 .wave-cos { stroke: var(--cos); }
 .wave-tan { stroke: var(--tan); }
+
+.equal-value-guide {
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.38;
+}
+
+.equal-value-guide-sin { stroke: var(--sin); }
+.equal-value-guide-cos { stroke: var(--cos); }
+
+.equal-value-point {
+  fill: #111c24;
+  stroke-width: 2.3;
+}
+
+.equal-value-point-sin { stroke: var(--sin); }
+.equal-value-point-cos { stroke: var(--cos); }
 
 .graph-marker {
   stroke: rgba(233, 226, 208, 0.75);

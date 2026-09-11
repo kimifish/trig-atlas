@@ -2,12 +2,13 @@ import { useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import {
   STANDARD_ANGLES,
   angleLabel,
+  cofunctionMatchAngles,
   exactValue,
   formatDecimal,
+  learningObservation,
   nearestStandardAngle,
   normalizeDegrees,
   quadrantFor,
-  standardAngleAt,
   trigValue,
   type TrigFunction
 } from "./trigonometry";
@@ -86,13 +87,16 @@ function MiniGraph({ angle, kind, unit, onKindChange }: MiniGraphProps) {
   const markerX = xFor(normalized);
   const sinY = middle - Math.sin((normalized * Math.PI) / 180) * amplitude;
   const cosY = middle - Math.cos((normalized * Math.PI) / 180) * amplitude;
+  const graphAngles = (angles: number[]) => angles.flatMap((match) => match === 0 ? [0, 360] : [match]);
+  const matchingCosAngles = graphAngles(cofunctionMatchAngles("sin", normalized));
+  const matchingSinAngles = graphAngles(cofunctionMatchAngles("cos", normalized));
   const tan = trigValue("tan", normalized);
   const tanY = tan === null ? null : middle - tan * 17;
 
   return (
     <section className="graph-panel" aria-label="График функций">
       <div className="graph-toolbar">
-        <span>Один оборот</span>
+        <span>{kind === "waves" ? "● текущие · ◇ равные" : "Один оборот"}</span>
         <div className="mini-switch" aria-label="Выбор графика">
           <button aria-pressed={kind === "waves"} className={kind === "waves" ? "active" : ""} onClick={() => onKindChange("waves")}>sin · cos</button>
           <button aria-pressed={kind === "tan"} className={kind === "tan" ? "active" : ""} onClick={() => onKindChange("tan")}>tan</button>
@@ -112,10 +116,34 @@ function MiniGraph({ angle, kind, unit, onKindChange }: MiniGraphProps) {
         ))}
         {kind === "waves" ? (
           <>
+            <line x1={left} y1={sinY} x2={right} y2={sinY} className="equal-value-guide equal-value-guide-sin" />
+            <line x1={left} y1={cosY} x2={right} y2={cosY} className="equal-value-guide equal-value-guide-cos" />
             <path d={wavePath("sin")} className="wave wave-sin" />
             <path d={wavePath("cos")} className="wave wave-cos" />
             <circle cx={markerX} cy={sinY} r="5" fill={COLORS.sin} />
             <circle cx={markerX} cy={cosY} r="5" fill={COLORS.cos} />
+            {matchingCosAngles.map((match) => (
+              <rect
+                key={`cos-${match}`}
+                x={xFor(match) - 4}
+                y={sinY - 4}
+                width="8"
+                height="8"
+                className="equal-value-point equal-value-point-cos"
+                transform={`rotate(45 ${xFor(match)} ${sinY})`}
+              />
+            ))}
+            {matchingSinAngles.map((match) => (
+              <rect
+                key={`sin-${match}`}
+                x={xFor(match) - 4}
+                y={cosY - 4}
+                width="8"
+                height="8"
+                className="equal-value-point equal-value-point-sin"
+                transform={`rotate(45 ${xFor(match)} ${cosY})`}
+              />
+            ))}
           </>
         ) : (
           <>
@@ -141,7 +169,7 @@ function UnitCircle({ angle, unit, mode, onAngleChange }: CircleProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const cx = 188;
   const cy = 181;
-  const radius = 122;
+  const radius = 132;
   const normalized = normalizeDegrees(angle);
   const point = polarPoint(cx, cy, radius, normalized);
   const radians = (normalized * Math.PI) / 180;
@@ -326,12 +354,7 @@ function ValueCard({ fn, angle, onSelect }: ValueCardProps) {
 }
 
 function LearningNote({ angle }: { angle: number }) {
-  const standard = standardAngleAt(angle);
-  const quadrant = quadrantFor(angle);
-  let text = "Гипотенуза всегда равна 1, поэтому координаты точки сразу дают cos α и sin α.";
-  if (standard) text = `${standard.pi} — стандартный угол. Его точные значения удобно запоминать через стороны опорного треугольника.`;
-  else if (quadrant) text = `В ${quadrant} четверти знак каждого катета определяется направлением соответствующей координатной оси.`;
-  return <aside className="learning-note"><span>Наблюдение</span><p>{text}</p></aside>;
+  return <aside className="learning-note"><span>Наблюдение</span><p>{learningObservation(angle)}</p></aside>;
 }
 
 export default function App() {

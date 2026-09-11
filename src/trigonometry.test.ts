@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   angleLabel,
+  cofunctionMatchAngles,
   exactValue,
+  learningObservation,
   nearestStandardAngle,
   normalizeDegrees,
   quadrantFor,
@@ -23,9 +25,27 @@ describe("angle helpers", () => {
     expect(angleLabel(150, "pi")).toBe("5π/6");
     expect(angleLabel(150, "degrees")).toBe("150°");
   });
+
+  it("finds every matching cofunction angle within one turn", () => {
+    expect(cofunctionMatchAngles("sin", 30)).toEqual([60, 300]);
+    expect(cofunctionMatchAngles("cos", 30)).toEqual([60, 120]);
+    expect(cofunctionMatchAngles("sin", 90)).toEqual([0]);
+  });
 });
 
 describe("trigonometric values", () => {
+  it("matches sine and cosine at the marked cofunction angles", () => {
+    const angle = 137;
+    const sine = trigValue("sin", angle);
+    const cosine = trigValue("cos", angle);
+    cofunctionMatchAngles("sin", angle).forEach((match) => {
+      expect(trigValue("cos", match)).toBeCloseTo(sine ?? 0);
+    });
+    cofunctionMatchAngles("cos", angle).forEach((match) => {
+      expect(trigValue("sin", match)).toBeCloseTo(cosine ?? 0);
+    });
+  });
+
   it("returns exact labels for standard sine and cosine", () => {
     expect(exactValue("sin", 30)).toBe("1/2");
     expect(exactValue("cos", 135)).toBe("−√2/2");
@@ -45,5 +65,20 @@ describe("trigonometric values", () => {
   it("identifies quadrants but not axes", () => {
     expect(quadrantFor(225)).toBe(3);
     expect(quadrantFor(270)).toBeNull();
+  });
+});
+
+describe("learning observations", () => {
+  it("explains the geometry of common angles with exact values", () => {
+    expect(learningObservation(30)).toContain("M(cos α; sin α) = (√3/2; 1/2)");
+    expect(learningObservation(30)).toContain("катет напротив 30° равен половине гипотенузы");
+    expect(learningObservation(45)).toContain("sin α = cos α");
+    expect(learningObservation(90)).toContain("tg α = не определён");
+  });
+
+  it("connects reflected angles to their reference angle and quadrant signs", () => {
+    expect(learningObservation(150)).toContain("Опорный угол — 30°");
+    expect(learningObservation(150)).toContain("во II четверти sin положителен");
+    expect(learningObservation(225)).toContain("в III четверти sin и cos отрицательны");
   });
 });

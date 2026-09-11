@@ -59,6 +59,14 @@ export function degreesToRadians(degrees: number): number {
   return (normalizeDegrees(degrees) * Math.PI) / 180;
 }
 
+export function cofunctionMatchAngles(source: "sin" | "cos", degrees: number): number[] {
+  const complementary = normalizeDegrees(90 - degrees);
+  const reflected = source === "sin"
+    ? normalizeDegrees(-complementary)
+    : normalizeDegrees(180 - complementary);
+  return [...new Set([complementary, reflected])].sort((a, b) => a - b);
+}
+
 export function nearestStandardAngle(degrees: number): StandardAngle {
   const normalized = normalizeDegrees(degrees);
   return STANDARD_ANGLES.slice(0, -1).reduce((closest, angle) => {
@@ -97,6 +105,46 @@ export function exactValue(fn: TrigFunction, degrees: number): string | undefine
   if (fn === "sin") return angle.sin;
   if (fn === "cos") return angle.cos;
   return EXACT_RATIOS[angle.degrees][fn];
+}
+
+const COMMON_ANGLE_INSIGHTS: Partial<Record<number, string>> = {
+  0: "Радиус лежит на положительной полуоси x; полный поворот вернёт точку сюда же.",
+  30: "В треугольнике 30°–60°–90° катет напротив 30° равен половине гипотенузы.",
+  45: "Опорный треугольник равнобедренный, поэтому sin α = cos α, а tg α = 1.",
+  60: "По сравнению с 30° значения синуса и косинуса меняются местами.",
+  90: "Здесь cos α = 0, поэтому отношение sin α / cos α для тангенса невозможно.",
+  180: "Радиус лежит на отрицательной полуоси x, а sin α обращается в ноль.",
+  270: "Радиус направлен вниз; cos α = 0, поэтому tg α не определён."
+};
+
+const QUADRANT_INSIGHTS: Record<number, string> = {
+  2: "во II четверти sin положителен, а cos и tg отрицательны",
+  3: "в III четверти sin и cos отрицательны, а tg положителен",
+  4: "в IV четверти cos положителен, а sin и tg отрицательны"
+};
+
+function referenceAngle(degrees: number): number {
+  if (degrees <= 90) return degrees;
+  if (degrees <= 180) return 180 - degrees;
+  if (degrees <= 270) return degrees - 180;
+  return 360 - degrees;
+}
+
+export function learningObservation(degrees: number): string {
+  const standard = standardAngleAt(degrees);
+  if (standard) {
+    const tangent = exactValue("tan", standard.degrees);
+    const commonInsight = COMMON_ANGLE_INSIGHTS[standard.degrees];
+    const quadrant = quadrantFor(standard.degrees);
+    const insight = commonInsight ?? (quadrant
+      ? `Опорный угол — ${referenceAngle(standard.degrees)}°: ${QUADRANT_INSIGHTS[quadrant]}.`
+      : "");
+    return `${standard.degrees}° (${standard.pi}): M(cos α; sin α) = (${standard.cos}; ${standard.sin}), tg α = ${tangent}. ${insight}`;
+  }
+
+  const quadrant = quadrantFor(degrees);
+  if (quadrant) return `В ${quadrant} четверти знак каждого катета определяется направлением соответствующей координатной оси.`;
+  return "Гипотенуза всегда равна 1, поэтому координаты точки сразу дают cos α и sin α.";
 }
 
 export function angleLabel(degrees: number, unit: "degrees" | "pi"): string {
